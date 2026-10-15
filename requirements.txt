@@ -1,6 +1,7 @@
 streamlit
 langchain
-langchain-openai
 langchain-community
+langchain-google-genai
+google-generativeai
 chromadb
 pydantic
