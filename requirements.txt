@@ -1,8 +1,4 @@
 streamlit
-langchain
-langchain-community
-langchain-google-genai
-google-generativeai
-chromadb
-pydantic
+openai
 pypdf
+pydantic
