@@ -8,8 +8,8 @@ st.set_page_config(page_title="InsurTech AI Platform (OpenAI)", page_icon="🤖"
 st.title("🤖 פלטפורמת InsurTech מתקדמת לתכנון פרישה וביטוח (מופעל ע\"י OpenAI)")
 st.write("מערכת אקולוגית חכמה לסוכני ביטוח: ניתוח סילוקיות, השוואת שוק, סיכומי פגישות ותחשיבים אקטואריים.")
 
-# 2. הגדרת מפתח ה-API של OpenAI
-OPENAI_API_KEY = "Sk-proj-f8aVi70T0f7U4X_jPCH1_X96RvL3qWo9amoe1miabJM4olSfzy8kGIc0sgqyTOiH5fEkFVoQkaT3BlbkFJfvlNC5E0_jMz0rad4plO4C5APXBOYLyu6210PVOvbbT8dK-0zvr7EpadbLKdRgwp-YoXkNCLAA"
+# 2. הגדרת מפתח ה-API החדש של OpenAI
+OPENAI_API_KEY = "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"
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 def ask_openai(system_prompt, user_prompt):
@@ -62,7 +62,7 @@ with tab1:
             st.markdown(user_query)
 
         with st.chat_message("assistant"):
-            with st.spinner("GPT-4o מנתח את התיק, מריץ תחשיבים אקטואריים ומגבש החלטה מקצועית..."):
+            with st.spinner("GPT-4o חושב, מנתח את התיק ומגבש החלטה מקצועית..."):
                 ai_answer = ask_openai(SYSTEM_EXPERT_PROMPT, user_query)
                 st.markdown(ai_answer)
                 st.session_state.messages.append({"role": "assistant", "content": ai_answer})
