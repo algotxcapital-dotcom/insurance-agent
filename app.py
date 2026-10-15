@@ -8,8 +8,8 @@ st.set_page_config(page_title="InsurTech AI Platform (OpenAI)", page_icon="🤖"
 st.title("🤖 פלטפורמת InsurTech מתקדמת לתכנון פרישה וביטוח (מופעל ע\"י OpenAI)")
 st.write("מערכת אקולוגית חכמה לסוכני ביטוח: ניתוח סילוקיות, השוואת שוק, סיכומי פגישות ותחשיבים אקטואריים.")
 
-# 2. הגדרת מפתח ה-API החדש של OpenAI
-OPENAI_API_KEY = "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"
+# 2. הגדרת מפתח ה-API של OpenAI
+OPENAI_API_KEY = "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"
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 def ask_openai(system_prompt, user_prompt):
