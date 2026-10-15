@@ -50,11 +50,11 @@ with tab1:
 
         with st.chat_message("assistant"):
             with st.spinner("Gemini מנתח את הנתונים, מריץ תחשיבים אקטואריים ומגבש החלטה מקצועית..."):
-                prompt_full = f"""אתה סוכן AI מומחה בכיר ומנכ"ל מקצועי של חברת תכנון פרישה, ביטוח והשקעות בישראל.
-תפקידך לתת החלטות מקצועיות וחד-משמעיות, לשלב חישובים לוגיים ומתמטיים, לציין סעיפי חוק רלוונטיים ולסיים בהמלצה אופרטיבית.
+                prompt_full = f"""You are a senior expert AI insurance and pension planning agent in Israel. 
+Provide a professional, definitive decision, include relevant mathematical logic, mention applicable tax or insurance laws in Israel, and end with an actionable recommendation for the agent.
 
-שאלה / תיק הלקוח: {user_query}
-ניתוח מקצועי והחלטה מנומקת:"""
+Client Case / Question: {user_query}
+Professional Analysis and Decision:"""
                 response = llm.invoke(prompt_full)
                 st.markdown(response.content)
                 st.session_state.messages.append({"role": "assistant", "content": response.content})
@@ -74,13 +74,13 @@ with tab2:
             for page in reader.pages:
                 pdf_text += page.extract_text() or ""
             
-            analysis_prompt = f"""להלן נתונים מחולצים מתוך דוח סילוקית פנסיונית של לקוח:
+            analysis_prompt = f"""Analyze the following pension clearinghouse report (Silukit) for an Israeli insurance agent:
 {pdf_text[:15000]}
 
-נתח את התיק הבא באופן מקצועי עבור סוכן הביטוח:
-1. ריכוז נכסים (קרנות פנסיה, ביטוחי מנהלים, קופות גמל).
-2. איתור דמי ניהול חריגים או כפל ביטוחי.
-3. המלצות אופרטיביות לשיפור התיק לקראת פרישה."""
+Provide in Hebrew:
+1. Asset summary (pension funds, executive insurance, provident funds).
+2. Identification of abnormal management fees or overlapping coverages.
+3. Actionable recommendations for pre-retirement optimization."""
             
             pdf_response = llm.invoke(analysis_prompt)
             st.markdown("### תוצאות ניתוח הסילוקית:")
@@ -101,7 +101,7 @@ with tab3:
     
     st.markdown("---")
     st.markdown("### 🔍 מצב יציבות ומאזן אקטוארי בקרנות הפנסיה:")
-    st.write("קרנות הפנסיה החדשות מתאפיינות ביתרת עודף אקטוארי או איזון בהתאם לתקנונים החדשים (מאזן אקטוארי חיובי מעיד על חיתום בריא ויציבות לחברי הקרן).")
+    st.write("קרנות הפנסיה החדשות מתאפיינות ביתרת עודף אקטוארי או איזון בהתאם לתקנונים החדשים.")
 
 # ==========================================
 # לשונית 4: סיכום פגישות שמע (Audio)
@@ -115,7 +115,6 @@ with tab4:
         st.success("קובץ השמע נקלט בהצלחה במערכת!")
         if st.button("הפק סיכום פגישה"):
             with st.spinner("Gemini מעבד את השמע ומפיק סיכומי פגישה מקצועיים..."):
-                # שמירת קובץ זמני והעלאה ל-Gemini API
                 audio_bytes = uploaded_audio.read()
                 audio_file_path = "temp_meeting_audio.mp3"
                 with open(audio_file_path, "wb") as f:
@@ -125,15 +124,14 @@ with tab4:
                 
                 audio_prompt = [
                     gemini_audio_file,
-                    "האזן להקלטת הפגישה הזו שבין סוכן ביטוח ללקוח, והפק שני תוצרים ברורים בעברית:\n"
-                    "1. סיכום טכני ומקצועי לסוכן (כולל משימות לביצוע, פעולות ניוד וחוסרים בתיק).\n"
-                    "2. סיכום ידידותי וממוקד ללקוח (בגובה העיניים, המפרט את ההחלטות שהתקבלו)."
+                    "Listen to this audio recording between an insurance agent and a client, and provide in Hebrew:\n"
+                    "1. A technical, professional summary for the agent (action items, transfers, missing coverages).\n"
+                    "2. A friendly, focused summary for the client explaining the agreed decisions."
                 ]
                 
                 audio_response = llm.invoke(audio_prompt)
                 st.markdown(audio_response.content)
                 
-                # ניקוי קובץ זמני
                 if os.path.exists(audio_file_path):
                     os.remove(audio_file_path)
 
@@ -152,4 +150,11 @@ with tab5:
         submit_form = st.form_submit_button("הפק נתונים לטופס רשמי")
         
         if submit_form:
-            form_prompt = f"""הכן טיוטת נתונים מס
+            form_prompt = f"""Generate a structured draft of data for filling official Israeli retirement forms (Form 161 / Tax Fixation) for:
+- Name: {f_name}
+- ID: {f_id}
+- Pension Balance: {f_pension} NIS
+- Managers Insurance Balance: {f_managers} NIS
+Present the details clearly in Hebrew for the agent."""
+            form_response = llm.invoke(form_prompt)
+            st.markdown(form_response.content)
