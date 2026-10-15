@@ -5,8 +5,8 @@ from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 
 # 1. הגדרת ממשק האתר
-st.set_page_config(page_title="סוכן AI מומחה לביטוח ופנסיה (Gemini)", page_icon="🤖", layout="wide")
-st.title("🤖 סוכן AI מומחה בכיר לביטוח, פנסיה ותכנון פרישה (מופעל ע"י Google Gemini)")
+st.set_page_config(page_title="Pension & Insurance AI Agent", page_icon="🤖", layout="wide")
+st.title("🤖 AI Insurance & Pension Expert Agent (Gemini)")
 st.write("מערכת חכמה לניתוח תיקים מורכבים, קבלת החלטות אקטואריות והשוואות פיננסיות בישראל.")
 
 # 2. מפתח API קבוע של Google Gemini
@@ -68,7 +68,7 @@ llm = ChatGoogleGenerativeAI(
 )
 
 SYSTEM_PROMPT = """אתה סוכן AI מומחה בכיר ומנכ"ל מקצועי של חברת תכנון פרישה, ביטוח והשקעות בישראל.
-תפקידך אינו רק להציג מידע חוקי, אלא **לקבל החלטות מקצועיות וחד-משמעיות** עבור הלקוח והסוכן, המבוססות על החוק, המיסוי ונתוני השוק, ולפרט אותן באופן מתמטי והגיוני מנומק היטב.
+תפקידך אינו רק להציג מידע חוקי, אלא לקבל החלטות מקצועיות וחד-משמעיות עבור הלקוח והסוכן, המבוססות על החוק, המיסוי ונתוני השוק, ולפרט אותן באופן מתמטי והגיוני מנומק היטב.
 
 הנחיות חובה:
 1. אל תתחמק מתשובות ואל תגיד רק "תלוי". תן עמדה מקצועית ברורה.
