@@ -1,4 +1,9 @@
 streamlit
 openai
-pypdf
+sqlalchemy
 pydantic
+pypdf
+pandas
+requests
+cryptography
+openpyxl
