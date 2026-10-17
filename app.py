@@ -24,7 +24,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship, Session
 
 # =====================================================================
-# 1. הגדרת עמוד, עיצוב יוקרתי RTL ותיקון עיגון תיבת הצ'אט לתחתית המסך
+# 1. הגדרת עמוד ועיצוב כהה יוקרתי מלא (Full Luxury Dark Mode + RTL)
 # =====================================================================
 st.set_page_config(
     page_title="LEVERAGE AI – מערכת תכנון פיננסי והשקעות",
@@ -36,48 +36,120 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap');
 
-    .stApp {
+    /* רקע כהה אחיד וטקסט בהיר חד בכל האפליקציה */
+    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
         direction: rtl;
         text-align: right;
         font-family: 'Assistant', 'Segoe UI', sans-serif;
-        background-color: #f8fafc;
+        background-color: #0b0f19 !important;
+        color: #f8fafc !important;
     }
+
+    [data-testid="stSidebar"] {
+        background-color: #111827 !important;
+        border-left: 1px solid #1e293b !important;
+    }
+
     p, div, h1, h2, h3, h4, h5, li, span, label, th, td {
         text-align: right !important;
         font-family: 'Assistant', 'Segoe UI', sans-serif;
+        color: #f1f5f9;
     }
+
+    /* עיצוב כותרות הלשוניות (Tabs) שיהיו בולטות וברורות במצב כהה */
+    button[data-baseweb="tab"] {
+        background-color: #161f33 !important;
+        color: #cbd5e1 !important;
+        border-radius: 10px 10px 0 0 !important;
+        padding: 10px 16px !important;
+        margin-left: 6px !important;
+        border: 1px solid #1e293b !important;
+        font-weight: 600 !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background-color: #1e3a8a !important;
+        color: #ffffff !important;
+        border-bottom: 3px solid #f59e0b !important;
+        font-weight: 800 !important;
+    }
+    button[data-baseweb="tab"] p {
+        color: inherit !important;
+        font-size: 0.98rem !important;
+    }
+
+    /* עיצוב כפתורים */
+    .stButton > button {
+        background-color: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #334155 !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease-in-out;
+    }
+    .stButton > button:hover {
+        background-color: #1e40af !important;
+        border-color: #60a5fa !important;
+        color: #ffffff !important;
+    }
+
+    /* בועות שיחה בצ'אט במצב כהה */
     .stChatMessage {
         direction: rtl;
-        background-color: #ffffff;
-        border: 1px solid #e2e8f0;
+        background-color: #111827 !important;
+        border: 1px solid #1e293b !important;
         border-radius: 14px;
-        padding: 16px;
+        padding: 18px;
         margin-bottom: 14px;
-        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    /* מדדים (Metrics) בכרטיסים כהים */
+    div[data-testid="stMetric"] {
+        background-color: #161f33 !important;
+        border: 1px solid #26334d !important;
+        border-radius: 12px !important;
+        padding: 14px 16px !important;
+    }
+    div[data-testid="stMetricLabel"] p {
+        color: #94a3b8 !important;
+        font-weight: 600 !important;
     }
     div[data-testid="stMetricValue"] {
         direction: ltr;
         text-align: right !important;
         font-weight: 800 !important;
-        color: #0f172a !important;
+        color: #38bdf8 !important;
+    }
+
+    /* אזורי הרחבה (Expanders) במצב כהה */
+    div[data-testid="stExpander"] {
+        background-color: #111827 !important;
+        border: 1px solid #1e293b !important;
+        border-radius: 12px !important;
+        margin-bottom: 10px !important;
+    }
+    div[data-testid="stExpander"] summary p {
+        color: #e2e8f0 !important;
+        font-weight: 700 !important;
     }
 
     /* כרטיס הדגל: הצעת ההשקעה שלי ללקוח */
     .proposal-hero-card {
-        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        background: linear-gradient(135deg, #0f172a 0%, #172554 100%);
         color: #ffffff !important;
         padding: 24px 28px;
         border-radius: 16px;
         margin: 12px 0 20px 0;
-        box-shadow: 0 10px 25px rgba(30, 58, 138, 0.18);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+        border: 1px solid #1e3a8a;
         border-right: 6px solid #f59e0b;
     }
     .proposal-hero-card h2, .proposal-hero-card h3, .proposal-hero-card p,
     .proposal-hero-card div, .proposal-hero-card span, .proposal-hero-card li {
-        color: #ffffff !important;
+        color: #f8fafc !important;
     }
     .proposal-badge-conditional {
-        background-color: rgba(245, 158, 11, 0.22);
+        background-color: rgba(245, 158, 11, 0.2);
         border: 1px solid #fbbf24;
         color: #fde68a !important;
         padding: 4px 12px;
@@ -88,72 +160,76 @@ st.markdown("""
         margin-bottom: 10px;
     }
     .proposal-why-box {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(15, 23, 42, 0.65);
         border-radius: 10px;
         padding: 14px 18px;
         margin-top: 14px;
         border-right: 4px solid #38bdf8;
     }
 
-    /* כרטיסי השקעה להשוואת 3 החלופות */
+    /* כרטיסי השקעה להשוואת 3 החלופות במצב כהה */
     .inv-card-primary {
-        background: #ffffff;
-        border: 2px solid #1e40af;
-        border-top: 6px solid #1e40af;
+        background: #162038;
+        border: 2px solid #3b82f6;
+        border-top: 6px solid #f59e0b;
         border-radius: 14px;
         padding: 18px;
         height: 100%;
-        box-shadow: 0 6px 18px rgba(30, 64, 175, 0.10);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     }
     .inv-card-secondary {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
+        background: #111827;
+        border: 1px solid #26334d;
         border-top: 5px solid #64748b;
         border-radius: 14px;
         padding: 18px;
         height: 100%;
-        box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
     .inv-card-tag-main {
-        background-color: #dbeafe;
-        color: #1e40af !important;
+        background-color: rgba(59, 130, 246, 0.25);
+        border: 1px solid #60a5fa;
+        color: #93c5fd !important;
         font-weight: 700;
         padding: 3px 10px;
         border-radius: 12px;
-        font-size: 0.8rem;
+        font-size: 0.82rem;
         display: inline-block;
         margin-bottom: 8px;
     }
     .inv-card-tag-alt {
-        background-color: #f1f5f9;
-        color: #334155 !important;
+        background-color: #1e293b;
+        border: 1px solid #475569;
+        color: #cbd5e1 !important;
         font-weight: 600;
         padding: 3px 10px;
         border-radius: 12px;
-        font-size: 0.8rem;
+        font-size: 0.82rem;
         display: inline-block;
         margin-bottom: 8px;
     }
+
+    /* תיבת התראה של מנוע מגבלות המוצרים במצב כהה */
     .constraint-alert-box {
-        background-color: #fffbeb;
+        background-color: rgba(120, 53, 15, 0.35);
         border: 1px solid #f59e0b;
-        border-right: 5px solid #d97706;
-        color: #92400e !important;
-        padding: 12px 16px;
+        border-right: 5px solid #fbbf24;
+        color: #fef3c7 !important;
+        padding: 14px 18px;
         border-radius: 10px;
         margin: 10px 0;
-        font-size: 0.95rem;
+        font-size: 0.96rem;
     }
 
-    /* עיגון תיבת ההקלדה של הצ'אט לתחתית המסך במחשב ובמובייל */
-    div[data-testid="stChatInput"] {
+    /* עיגון תיבת ההקלדה של הצ'אט לתחתית המסך בעיצוב כהה אחיד */
+    div[data-testid="stChatInput"], [data-testid="stBottom"] > div {
         position: sticky !important;
         bottom: 0 !important;
         z-index: 999 !important;
-        background-color: #f8fafc !important;
+        background-color: #0b0f19 !important;
         padding-top: 8px !important;
         padding-bottom: 8px !important;
-        border-top: 1px solid #e2e8f0;
+        border-top: 1px solid #1e293b !important;
         direction: rtl;
     }
 </style>
@@ -294,10 +370,10 @@ class Client(Base):
     id_last4 = Column(String(4), nullable=False)
     birth_year = Column(Integer, nullable=False)
     marital_status = Column(String(30), default="נשוי/אה")
-    employment_status = Column(String(40), default="שכיר/ה")  # שכיר/ה | עצמאי/ת | שכיר ובעל שליטה | פורש/ת
+    employment_status = Column(String(40), default="שכיר/ה")
     target_retirement_age = Column(Integer, default=67)
     monthly_salary = Column(Float, default=0.0)
-    existing_gemel_deposits_this_year = Column(Float, default=0.0)  # הפקדות שכבר בוצעו השנה לגמל להשקעה
+    existing_gemel_deposits_this_year = Column(Float, default=0.0)
     is_smoker = Column(Boolean, default=False)
     risk_profile = Column(String(50), default="טרם נקבע (דורש בירור צרכים)")
     investment_horizon_years = Column(Integer, nullable=True)
@@ -361,21 +437,17 @@ class ClientChat(Base):
 
 
 class ProductConstraintRule(Base):
-    """
-    טבלת מגבלות מוצרים רשמית ומאומתת (לבדיקה דטרמיניסטית ב-Python לפני הצגת כל המלצה).
-    כוללת תקרת הפקדה שנתית/כוללת, מינימום פתיחה, מגבלות גיל, תנאי זכאות, נזילות ומקור חוקי.
-    """
     __tablename__ = "product_constraint_rules"
     id = Column(Integer, primary_key=True)
     product_category = Column(String(80), unique=True, nullable=False)
-    annual_deposit_ceiling_ils = Column(Float, nullable=True)     # None = ללא תקרת הפקדה שנתית
-    total_deposit_ceiling_ils = Column(Float, nullable=True)      # None = ללא תקרה כוללת
-    is_global_per_person_ceiling = Column(Boolean, default=False) # האם התקרה חלה במצטבר לכל הקופות של האדם יחד
-    min_lump_sum_open_ils = Column(Float, default=0.0)            # סכום מינימום מקובל לפתיחה חד-פעמית
-    min_monthly_deposit_ils = Column(Float, default=0.0)          # סכום מינימום להוראת קבע
+    annual_deposit_ceiling_ils = Column(Float, nullable=True)
+    total_deposit_ceiling_ils = Column(Float, nullable=True)
+    is_global_per_person_ceiling = Column(Boolean, default=False)
+    min_lump_sum_open_ils = Column(Float, default=0.0)
+    min_monthly_deposit_ils = Column(Float, default=0.0)
     min_age = Column(Integer, nullable=True)
     max_age = Column(Integer, nullable=True)
-    tax_benefit_age_threshold = Column(Integer, nullable=True)    # למשל גיל 60 לקצבה פטורה בגמל להשקעה / תיקון 190
+    tax_benefit_age_threshold = Column(Integer, nullable=True)
     eligibility_condition = Column(String(250), default="פתוח לכלל הציבור")
     tax_benefit_rules = Column(Text, default="")
     withdrawal_and_liquidity_rules = Column(Text, default="")
@@ -478,7 +550,6 @@ def init_and_seed_database():
             ])
             db.commit()
 
-        # זריעת טבלת מגבלות המוצרים (Product Constraints Engine)
         if db.query(ProductConstraintRule).count() == 0:
             rules = [
                 ProductConstraintRule(
@@ -599,7 +670,6 @@ def init_and_seed_database():
             db.add_all(rules)
             db.commit()
 
-        # זריעת מסלולי שוק אמיתיים (גמל-נט, ביטוח-נט, תיקים מנוהלים ושוק ההון)
         if db.query(MarketTrackMetric).count() == 0:
             tracks = [
                 MarketTrackMetric(
@@ -690,49 +760,8 @@ def init_and_seed_database():
                     cons_for_client="תשואה מוגבלת לריבית בנק ישראל",
                     aum_millions_ils=130000, service_score=88.0
                 ),
-                MarketTrackMetric(
-                    source_system="גמל-נט", track_id_code="1540", provider_name="ילין לפידות", product_category="קרן השתלמות",
-                    track_name="ילין לפידות השתלמות כללי / מניות", equity_exposure_pct=42.0, foreign_exposure_pct=49.0,
-                    asset_mix_desc="מניות ואג\"ח סחיר", avg_fee_balance_pct=0.62, avg_fee_deposit_pct=0.0,
-                    yield_1yr_pct=11.0, yield_3yr_cumulative_pct=24.6, yield_5yr_cumulative_pct=44.2, sharpe_ratio=0.95,
-                    risk_level_label="בינונית", liquidity_terms="נזיל לאחר 6 שנים (או 3 שנים להשתלמות)",
-                    tax_rules_summary="פטור מלא ממס רווחי הון (0% מס) עד התקרה השנתית המוטבת",
-                    pros_for_client="פטור מלא ממס רווחי הון",
-                    cons_for_client="מותנה בזכאות (שכיר דרך מעסיק או עצמאי בעל הכנסה מעסק בלבד) וכפוף לתקרה מוטבת",
-                    aum_millions_ils=32000, service_score=88.0
-                ),
             ]
             db.add_all(tracks)
-            db.commit()
-
-        if db.query(KnowledgeSourceItem).count() == 0:
-            db.add_all([
-                KnowledgeSourceItem(
-                    code_key="INV_GEMEL_CAP_2026", domain_scope="INVESTMENT", category="חקיקה ומיסוי השקעות",
-                    title="חוק הפיקוח על שירותים פיננסיים (קופות גמל) סעיף 22 – תקרת הפקדה שנתית לקופת גמל להשקעה",
-                    section_ref="סעיף 22 לחוק קופות גמל",
-                    content_text="תקרת ההפקדה השנתית לקופת גמל להשקעה עומדת על 79,006 ש\"ח לאדם לשנת מס. התקרה חלה על סך ההפקדות של אותו אדם בכל קופות הגמל להשקעה שלו אצל כלל הגופים המוסדיים יחד. לא ניתן להפקיד מעבר לתקרה זו, ואין לפתוח קופות במספר בתי השקעות לצורך עקיפת התקרה.",
-                    legal_status="חוק בתוקף", reliability_tier=1,
-                    authority_name="רשות שוק ההון ורשות המסים", source_url="https://www.gov.il/he/pages/report_cma",
-                    effective_from="2026-01-01", last_updated="2026-01-05"
-                ),
-                KnowledgeSourceItem(
-                    code_key="INV_SUITABILITY_LAW", domain_scope="GENERAL", category="חקיקה",
-                    title="חוק הייעוץ והשיווק הפנסיוני וחוק ייעוץ השקעות – חובת בירור צרכים והתאמת סיכון",
-                    section_ref="סעיף 12",
-                    content_text="אין להציג מוצר כ'מומלץ סופית ללקוח' בטרם הושלם בירור צרכים מתועד הכולל מטרות השקעה, אופק, צורכי נזילות, מצב פיננסי הכולל וסיבולת סיכון.",
-                    legal_status="חוק בתוקף", reliability_tier=1,
-                    authority_name="רשות שוק ההון ורשות ניירות ערך", source_url="https://main.knesset.gov.il",
-                    effective_from="2005-08-10", last_updated="2026-01-01"
-                ),
-            ])
-            db.commit()
-
-        if db.query(InsuranceTariffCatalog).count() == 0:
-            db.add_all([
-                InsuranceTariffCatalog(provider_name="הראל", insurance_branch="ביטוח חיים (ריסק)", plan_name="מענקית ריסק מוות", base_monthly_rate_per_100k_age35=11.5, age_slope_pct_per_year=6.8, smoker_surcharge_pct=45.0, max_discount_pct=32.0, discount_valid_years=5, coverage_scope_details="פיצוי חד-פעמי למקרה מוות מכל סיבה + אופציית הגדלה ללא חיתום.", waiting_period_days=0, deductible_ils=0.0, exclusions_and_underwriting="כפוף להצהרת בריאות וחיתום."),
-                InsuranceTariffCatalog(provider_name="הפניקס", insurance_branch="ביטוח חיים (ריסק)", plan_name="ריסק 1 מתחדש", base_monthly_rate_per_100k_age35=11.2, age_slope_pct_per_year=6.7, smoker_surcharge_pct=42.0, max_discount_pct=35.0, discount_valid_years=6, coverage_scope_details="פיצוי למקרה מוות + הקדמת 50% בחולה סופני.", waiting_period_days=0, deductible_ils=0.0, exclusions_and_underwriting="כפוף לחיתום רפואי."),
-            ])
             db.commit()
 
         if db.query(AgencyCommissionAgreement).count() == 0:
@@ -752,10 +781,6 @@ init_and_seed_database()
 # 5. מנוע בדיקת מגבלות מוצרים (Product Constraints Validator) ב-Python
 # =====================================================================
 def extract_case_parameters(user_query: str, active_client: Optional[Client] = None) -> Dict[str, Any]:
-    """
-    מפענח מתוך שאלת הסוכן (כולל תמיכה בביטויים כמו '5 מיליון', 'חצי מיליון', '50 אלף')
-    ומתוך כרטיס הלקוח את כל פרמטרי ההשקעה לבדיקת מנוע המגבלות.
-    """
     q = user_query.replace(",", "")
     age = (2026 - active_client.birth_year) if active_client else None
     age_match = re.search(r"בן\s*(\d{2})|בת\s*(\d{2})|גיל\s*(\d{2})", q)
@@ -765,7 +790,6 @@ def extract_case_parameters(user_query: str, active_client: Optional[Client] = N
     monthly_deposit = 0.0
     initial_lump_sum = 0.0
 
-    # זיהוי ביטויי "X מיליון" או "חצי מיליון"
     mil_match = re.search(r"(\d+(?:\.\d+)?)\s*מיליון", q)
     if mil_match:
         initial_lump_sum = float(mil_match.group(1)) * 1_000_000.0
@@ -774,7 +798,6 @@ def extract_case_parameters(user_query: str, active_client: Optional[Client] = N
     elif "מיליון" in q:
         initial_lump_sum = 1_000_000.0
 
-    # זיהוי הפקדה חודשית
     mo_match = re.search(r"(\d+(?:\.\d+)?)\s*(?:ש\"ח|₪|שח)?\s*(?:בכל\s*חודש|בחודש|חודשי|להפקיד\s*מדי\s*חודש)", q)
     if not mo_match:
         mo_match = re.search(r"(?:להפקיד|הפקדה\s*חודשית\s*של)\s*(\d+(?:\.\d+)?)", q)
@@ -783,7 +806,6 @@ def extract_case_parameters(user_query: str, active_client: Optional[Client] = N
         if val < 100_000:
             monthly_deposit = val
 
-    # זיהוי מספרים מפורשים (כגון 5000000 או 50000)
     all_nums = [float(n) for n in re.findall(r"\b\d{4,9}\b", q)]
     for num in all_nums:
         if num != monthly_deposit and num > 2030:
@@ -824,6 +846,7 @@ def extract_case_parameters(user_query: str, active_client: Optional[Client] = N
         "monthly_deposit": monthly_deposit,
         "total_first_year_deposit": initial_lump_sum + (monthly_deposit * 12.0),
         "existing_gemel_this_year": existing_gemel_this_year,
+        "explicit_numbers_found": explicit_numbers_found,
         "horizon_years": horizon_years,
         "short_term_goal_detected": short_term_goal,
         "is_self_employed": is_self_employed,
@@ -833,11 +856,6 @@ def extract_case_parameters(user_query: str, active_client: Optional[Client] = N
 
 
 def validate_product_constraints_python(db: Session, case_params: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    מנוע בקרה דטרמיניסטי ב-Python הרץ לפני יצירת ההמלצה!
-    בודק לכל מוצר בטבלת ProductConstraintRule האם הוא יכול לקלוט את הסכום המבוקש,
-    מהן מגבלות התקרה השנתית, סכומי המינימום ותנאי הזכאות, ומתקן אוטומטית את תמהיל המוצרים.
-    """
     rules = {r.product_category: r for r in db.query(ProductConstraintRule).all()}
     total_yr1 = case_params["total_first_year_deposit"]
     lump = case_params["initial_lump_sum"]
@@ -856,7 +874,6 @@ def validate_product_constraints_python(db: Session, case_params: Dict[str, Any]
     supplementary_products = []
     blocked_or_restricted_products = []
 
-    # 1. בדיקת קופת גמל להשקעה מול הסכום המבוקש
     if total_yr1 > remaining_gemel_cap:
         uncapped_excess = total_yr1 - remaining_gemel_cap
         blocked_or_restricted_products.append({
@@ -892,7 +909,6 @@ def validate_product_constraints_python(db: Session, case_params: Dict[str, Any]
             "מקור חוקי": gemel_rule.regulatory_source_name,
         })
 
-    # 2. בדיקת תיק השקעות מנוהל (בדיקת סכום מינימום 300,000 ₪)
     pm_rule = rules["תיק השקעות מנוהל"]
     if lump >= pm_rule.min_lump_sum_open_ils:
         approved_primary_products.insert(0, "תיק השקעות מנוהל (ללא תקרת הפקדה, עומד ברף המינימום של בתי ההשקעות)")
@@ -914,7 +930,6 @@ def validate_product_constraints_python(db: Session, case_params: Dict[str, Any]
             "מקור חוקי": pm_rule.regulatory_source_name,
         })
 
-    # 3. בדיקת תיק השקעות עצמאי (קרנות סל) ופוליסת חיסכון (ללא תקרה)
     approved_primary_products.append("תיק השקעות עצמאי בקרנות סל (ללא תקרת הפקדה, עלויות מינימליות)")
     approved_primary_products.append("פוליסת חיסכון פיננסית (ללא תקרת הפקדה, מעבר מסלולים בדחיית מס)")
     if short_term:
@@ -929,7 +944,6 @@ def validate_product_constraints_python(db: Session, case_params: Dict[str, Any]
         "מקור חוקי": rules["פוליסת חיסכון"].regulatory_source_name,
     })
 
-    # 4. בדיקת קרן השתלמות (תנאי זכאות + תקרה מוטבת)
     kh_rule = rules["קרן השתלמות"]
     if case_params["is_self_employed"]:
         supplementary_products.append(
@@ -964,10 +978,6 @@ def run_simulation_5_10_20_years(
     fee_pct_main: float = 0.55,
     fee_pct_low: float = 0.18,
 ) -> Dict[str, Any]:
-    """
-    מחשב ב-Python סימולציה נקייה וברורה ל-5, 10 ו-20 שנה בפורמט ישראלי,
-    ללא אינדקסים מיותרים ועם כותרות עמודות קצרות וברורות.
-    """
     rows = []
     for yrs in horizons:
         months = yrs * 12
@@ -1013,16 +1023,16 @@ def run_simulation_5_10_20_years(
 # =====================================================================
 class InvestmentOptionCardSchema(BaseModel):
     option_rank_label: str = Field(description="תווית הכרטיס: 'חלופה מרכזית לבחינה' / 'חלופה שנייה להשוואה' / 'חלופה שלישית (או נדבך משלים עד התקרה)'")
-    product_name_and_allocation: str = Field(description="שם המוצר וסכום ההקצאה הרלוונטי מתוך כספי הלקוח (למשל: תיק השקעות מנוהל – 4,921,000 ₪, או קופת גמל להשקעה כנדבך משלים – עד 79,006 ₪)")
-    provider_name: str = Field(description="שם הגוף המנהל (או הגופים המובילים לבדיקה מהמאגר)")
-    track_name: str = Field(description="מסלול ההשקעה ומספרו (אם קיים במאגר)")
+    product_name_and_allocation: str = Field(description="שם המוצר וסכום ההקצאה הרלוונטי מתוך כספי הלקוח")
+    provider_name: str = Field(description="שם הגוף המנהל")
+    track_name: str = Field(description="מסלול ההשקעה ומספרו")
     management_fees: str = Field(description="דמי ניהול מדווחים במאגר או הצעה שיש לקבל")
     equity_exposure: str = Field(description="רמת חשיפה למניות")
     yield_metrics: str = Field(description="נתוני תשואה רלוונטיים לתקופה זהה מהמאגר (1/3/5 שנים)")
     risk_level: str = Field(description="רמת סיכון")
     key_advantage: str = Field(description="יתרון מרכזי עבור הלקוח")
     key_disadvantage: str = Field(description="חיסרון מרכזי או מגבלה מהותית")
-    suitability_status: str = Field(description="סטטוס התאמה לנתוני הלקוח (למשל: 'מותנה בהשלמת בירור צרכים וסיכון' / 'מוגבל לתקרה שנתית של 79,006 ₪')")
+    suitability_status: str = Field(description="סטטוס התאמה לנתוני הלקוח")
 
 
 class ProviderComparisonTableRow(BaseModel):
@@ -1039,32 +1049,27 @@ class ProviderComparisonTableRow(BaseModel):
 
 
 class StructuredInvestmentProposal(BaseModel):
-    # נתוני הכרטיס העליון: "הצעת ההשקעה שלי ללקוח"
     suitability_badge: str = Field(
         description="חיווי בקרה: 'המלצה מותנית לבחינה – טרם הושלם בירור צרכים מלא' או 'הצעה מותאמת לאחר בירור צרכים'"
     )
     client_profile_brief: str = Field(description="פרופיל הלקוח בקצרה")
-    investment_amount_display: str = Field(description="סכום ההשקעה (חד-פעמי ו/או חודשי בפורמט ישראלי עם ₪)")
-    investment_horizon_display: str = Field(description="טווח ההשקעה (או ציון שדורש בירור)")
-    risk_level_display: str = Field(description="רמת הסיכון הרלוונטית (או ציון שתיקבע לאחר שאלון סיכון)")
-    primary_proposed_product: str = Field(description="מוצר ההשקעה המרכזי המוצע לבחינה (כולל התייחסות לתקרת הפקדה אם הסכום גבוה)")
+    investment_amount_display: str = Field(description="סכום ההשקעה (בפורמט ישראלי עם ₪)")
+    investment_horizon_display: str = Field(description="טווח ההשקעה")
+    risk_level_display: str = Field(description="רמת הסיכון הרלוונטית")
+    primary_proposed_product: str = Field(description="מוצר ההשקעה המרכזי המוצע לבחינה")
     specific_provider_and_track: str = Field(description="הגוף המנהל והמסלול הספציפי לבחינה מתוך המאגר המאומת")
     current_or_target_fees: str = Field(description="דמי הניהול העדכניים במאגר או הצעת מחיר שיש לקבל")
     why_this_solution_rationale: str = Field(description="למה דווקא הפתרון הזה? הסבר מקצועי, ממוקד וברור.")
     missing_info_before_final_rec: List[str] = Field(description="מידע חסר שיש להשלים לפני המלצה סופית")
-
-    # 3 כרטיסי השקעה להשוואה ויזואלית
     three_investment_cards: List[InvestmentOptionCardSchema] = Field(
-        description="שלוש החלופות המרכזיות ככרטיסי השקעה (כרטיס 1: החלופה המרכזית, כרטיסים 2 ו-3: חלופות להשוואה או נדבך משלים)"
+        description="שלוש החלופות המרכזיות ככרטיסי השקעה"
     )
-
-    # תוכן עבור 7 אזורי ההרחבה (Expanders)
     detailed_provider_comparison: List[ProviderComparisonTableRow] = Field(
         description="טבלת השוואת גופים ומסלולים אמיתיים מהמאגר"
     )
     fees_and_costs_analysis: str = Field(description="ניתוח דמי ניהול, עלויות נלוות והנחות גודל שיש לבקש")
     pros_and_cons_deep_dive: str = Field(description="ניתוח יתרונות, חסרונות וסיכונים מפורט לכל חלופה")
-    tax_considerations: str = Field(description="שיקולי מיסוי רלוונטיים למקרה (דחיית מס, 25% ריאלי, קיזוז הפסדים, סעיף 125ד וכו')")
+    tax_considerations: str = Field(description="שיקולי מיסוי רלוונטיים למקרה")
     sources_and_professional_data: List[str] = Field(description="מקורות רשמיים, תאריכי עדכון והוראות חוק רלוונטיות")
     questions_to_complete_discovery: List[str] = Field(description="שאלות ממוקדות להשלמת בירור צרכים מול הלקוח")
     direct_followup_answer: str = Field(description="מענה ישיר וממוקד במידה והסוכן שאל שאלת המשך ספציפית בשיחה")
@@ -1080,16 +1085,8 @@ def generate_structured_proposal_turn(
     chat_history_turns: List[Dict[str, Any]],
     active_client: Optional[Client] = None,
 ) -> Dict[str, Any]:
-    """
-    מבצע:
-    1. חילוץ פרמטרים מהשאלה (או שימור הסכומים מהשיחה הקודמת אם זו שאלת המשך!).
-    2. הרצת מנוע בדיקת מגבלות מוצרים ב-Python (חסימת גמל להשקעה כפתרון מלא ל-5 מיליון ₪).
-    3. הרצת סימולציית Python ל-5, 10 ו-20 שנה.
-    4. קריאה ל-OpenAI להפקת JSON מובנה (`StructuredInvestmentProposal`) עם זיכרון שיחה מלא.
-    """
     case_params = extract_case_parameters(user_query, active_client)
 
-    # אם זו שאלת המשך שבה לא הוזכרו סכומים חדשים, נשמר את הסכומים מהסבב הקודם בשיחה!
     if not case_params["explicit_numbers_found"] and chat_history_turns:
         for prev in reversed(chat_history_turns):
             if prev.get("case_params"):
@@ -1116,7 +1113,6 @@ def generate_structured_proposal_turn(
         for t in all_tracks
     ])
 
-    # בניית היסטוריית שיחה קודמת עבור שאלות המשך
     prev_conversation_summary = ""
     if chat_history_turns:
         hist_lines = []
@@ -1151,7 +1147,7 @@ def generate_structured_proposal_turn(
    - המוצר המרכזי (`primary_proposed_product` וכרטיס השקעה #1) חייב להיות מוצר ללא תקרת הפקדה המתאים להיקף הכספים: כגון בחינת **תיק השקעות מפוזר ומנוהל** או **תיק השקעות עצמאי**, או **פוליסת חיסכון פיננסית** (או שילוב ביניהם).
    - ניתן להציג את קופת הגמל להשקעה אך ורק כנדבך משלים מוגבל (עד יתרת התקרה החוקית של 79,006 ₪ לשנה לאדם), וחובה לציין שהתקרה חלה על החוסך במצטבר בכל הגופים יחד ושלא ניתן לעקוף אותה על ידי פתיחת קופות במספר בתי השקעות!
 2. התניה בבירור צרכים:
-   - אם `needs_discovery_incomplete` הוא `True`, אל תכתוב שהמוצר "מומלץ סופית ללקוח", אלאנסח: "מוצע לבחינה (מותנה בהשלמת בירור צרכים, אופק וסיכון)".
+   - אם `needs_discovery_incomplete` הוא `True`, אל תכתוב שהמוצר "מומלץ סופית ללקוח", אלא נסח: "מוצע לבחינה (מותנה בהשלמת בירור צרכים, אופק וסיכון)".
 3. שימוש בנתונים מאומתים בלבד:
    - השתמש אך ורק במסלולים, דמי הניהול והתשואות ממאגר הנתונים שלהלן. אל תמציא מספרים.
 4. התייחסות לשאלות המשך:
@@ -1201,10 +1197,9 @@ def generate_structured_proposal_turn(
 
 
 # =====================================================================
-# 8. רכיב UI ייעודי להצגת "הצעת ההשקעה שלי ללקוח" + כרטיסי השקעה + הרחבות + PDF
+# 8. רכיב UI ייעודי (מותאם ל-Dark Mode) להצגת "הצעת ההשקעה שלי ללקוח"
 # =====================================================================
 def generate_printable_html_proposal(turn_data: Dict[str, Any], agent_name: str) -> str:
-    """מייצר מסמך הצעת השקעה רשמי ומעוצב בעברית (RTL) המוכן להדפסה או שמירה כ-PDF ללקוח."""
     p = turn_data["proposal"]
     sim_rows = turn_data["sim_5_10_20"]["table"]
     cards_html = ""
@@ -1259,25 +1254,16 @@ def generate_printable_html_proposal(turn_data: Dict[str, Any], agent_name: str)
         <thead><tr><th>תקופה</th><th>סך הפקדות (קרן)</th><th>רווח ריאלי משוער</th><th>נטו לאחר 25% מס</th><th>השפעת דמי ניהול</th></tr></thead>
         <tbody>{sim_trs}</tbody>
     </table>
-    <p style="font-size:0.85rem;color:#475569;margin-top:18px;">הבהרה: מסמך זה הופק כעזר תכנוני ואושר להצגה ע"י בעל הרישיון. תשואות עבר והנחות סימולציה אינן מהווות הבטחת תשואה עתידית.</p>
+    <p style="font-size:0.85rem;color:#475569;margin-top:18px;">הבהרה: מסמך זה הופק כעזר תכנוני ואושר להצגה ע"י בעל הרישיון. תשואות עבר והנחות סימולציה אינן מהוות הבטחת תשואה עתידית.</p>
 </body>
 </html>"""
 
 
 def render_investment_proposal_ui(turn_data: Dict[str, Any], turn_idx: int, expand_all: bool, agent_name: str):
-    """
-    מרנדר את תבנית התשובה החדשה והאלגנטית:
-    1. התראת מנוע המגבלות (אם הופעלה, למשל ב-5 מיליון ₪).
-    2. כרטיס הדגל: "הצעת ההשקעה שלי ללקוח".
-    3. 3 כרטיסי השקעה מעוצבים + טבלה קטנה ונקייה (ללא אינדקסים!).
-    4. 7 כפתורי הרחבה (Expanders) מסודרים.
-    5. אישור סוכן והפקת PDF/HTML ללקוח.
-    """
     constraints_rep = turn_data["constraints_report"]
     sim_data = turn_data["sim_5_10_20"]
     proposal = turn_data.get("proposal")
 
-    # הצגת התראת מנוע בדיקת מגבלות מוצרים (למשל כאשר הסכום הוא 5,000,000 ₪)
     for warn_msg in constraints_rep.get("constraint_warnings", []):
         st.markdown(f'<div class="constraint-alert-box">{warn_msg}</div>', unsafe_allow_html=True)
 
@@ -1289,7 +1275,6 @@ def render_investment_proposal_ui(turn_data: Dict[str, Any], turn_idx: int, expa
         st.dataframe(pd.DataFrame(sim_data["table"]), use_container_width=True, hide_index=True)
         return
 
-    # מענה ישיר לשאלת המשך (אם קיימת)
     if proposal.get("direct_followup_answer") and turn_idx > 0:
         st.info(f"💬 **מענה ממוקד לשאלת ההמשך שלך:** {proposal['direct_followup_answer']}")
 
@@ -1316,14 +1301,14 @@ def render_investment_proposal_ui(turn_data: Dict[str, Any], turn_idx: int, expa
         unsafe_allow_html=True,
     )
 
-    # 4 מדדי ליבה ברורים מתחת לכרטיס
+    # 4 מדדי ליבה ברורים
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("סכום ההשקעה", proposal["investment_amount_display"])
     m2.metric("טווח ההשקעה", proposal["investment_horizon_display"])
     m3.metric("רמת סיכון", proposal["risk_level_display"])
     m4.metric("דמי ניהול לבחינה", proposal["current_or_target_fees"])
 
-    # 2. שלושת כרטיסי ההשקעה (Investment Cards) במקום טבלה עמוסה
+    # 2. שלושת כרטיסי ההשקעה (בצבעי Dark Mode חדים ויוקרתיים)
     cards = proposal.get("three_investment_cards", [])
     if cards:
         st.markdown("#### 🗂️ שלוש החלופות המרכזיות לבחינה")
@@ -1337,22 +1322,21 @@ def render_investment_proposal_ui(turn_data: Dict[str, Any], turn_idx: int, expa
                     f"""
                     <div class="{css_cls}">
                         <span class="{tag_cls}">{card_item['option_rank_label']}</span>
-                        <h4 style="margin: 4px 0 8px 0; color: #0f172a;">{card_item['product_name_and_allocation']}</h4>
-                        <p style="margin: 3px 0; font-size: 0.92rem;"><strong>גוף מנהל:</strong> {card_item['provider_name']}</p>
-                        <p style="margin: 3px 0; font-size: 0.92rem;"><strong>מסלול:</strong> {card_item['track_name']}</p>
-                        <p style="margin: 3px 0; font-size: 0.92rem;"><strong>דמי ניהול:</strong> {card_item['management_fees']}</p>
-                        <p style="margin: 3px 0; font-size: 0.92rem;"><strong>חשיפה למניות:</strong> {card_item['equity_exposure']} | <strong>סיכון:</strong> {card_item['risk_level']}</p>
-                        <p style="margin: 3px 0; font-size: 0.92rem;"><strong>תשואות:</strong> {card_item['yield_metrics']}</p>
-                        <hr style="margin: 8px 0; border-color: #e2e8f0;">
-                        <p style="margin: 3px 0; font-size: 0.88rem; color: #166534;"><strong>➕ יתרון מרכזי:</strong> {card_item['key_advantage']}</p>
-                        <p style="margin: 3px 0; font-size: 0.88rem; color: #991b1b;"><strong>➖ חיסרון / מגבלה:</strong> {card_item['key_disadvantage']}</p>
-                        <p style="margin: 6px 0 0 0; font-size: 0.82rem; background:#f8fafc; padding:4px 8px; border-radius:6px;"><strong>סטטוס התאמה:</strong> {card_item['suitability_status']}</p>
+                        <h4 style="margin: 4px 0 8px 0; color: #f8fafc !important;">{card_item['product_name_and_allocation']}</h4>
+                        <p style="margin: 3px 0; font-size: 0.92rem; color: #e2e8f0 !important;"><strong>גוף מנהל:</strong> {card_item['provider_name']}</p>
+                        <p style="margin: 3px 0; font-size: 0.92rem; color: #e2e8f0 !important;"><strong>מסלול:</strong> {card_item['track_name']}</p>
+                        <p style="margin: 3px 0; font-size: 0.92rem; color: #e2e8f0 !important;"><strong>דמי ניהול:</strong> {card_item['management_fees']}</p>
+                        <p style="margin: 3px 0; font-size: 0.92rem; color: #e2e8f0 !important;"><strong>חשיפה למניות:</strong> {card_item['equity_exposure']} | <strong>סיכון:</strong> {card_item['risk_level']}</p>
+                        <p style="margin: 3px 0; font-size: 0.92rem; color: #e2e8f0 !important;"><strong>תשואות:</strong> {card_item['yield_metrics']}</p>
+                        <hr style="margin: 8px 0; border-color: #334155;">
+                        <p style="margin: 3px 0; font-size: 0.88rem; color: #4ade80 !important;"><strong>➕ יתרון מרכזי:</strong> {card_item['key_advantage']}</p>
+                        <p style="margin: 3px 0; font-size: 0.88rem; color: #f87171 !important;"><strong>➖ חיסרון / מגבלה:</strong> {card_item['key_disadvantage']}</p>
+                        <p style="margin: 8px 0 0 0; font-size: 0.82rem; background:#1e293b; color:#f1f5f9 !important; padding:6px 10px; border-radius:8px; border:1px solid #334155;"><strong>סטטוס התאמה:</strong> {card_item['suitability_status']}</p>
                     </div>
                     """,
                     unsafe_allow_html=True,
                 )
 
-        # טבלה קטנה ונקייה של החלופות הנוספות (ללא אינדקסים 0, 1, 2!)
         if len(cards) > 1:
             st.markdown("##### 📌 תמצית השוואת החלופות הנוספות")
             alt_df = pd.DataFrame([
@@ -1369,7 +1353,7 @@ def render_investment_proposal_ui(turn_data: Dict[str, Any], turn_idx: int, expa
             ])
             st.dataframe(alt_df, use_container_width=True, hide_index=True)
 
-    # 3. שבעת כפתורי ההרחבה (Expanders) – סגורים כברירת מחדל לשמירה על מסך נקי!
+    # 3. שבעת כפתורי ההרחבה (Expanders)
     st.markdown("##### 🔍 פירוט מקצועי, השוואות וסימולציות (לחץ להרחבה)")
 
     with st.expander("🏢 הצג השוואת גופים ומסלולים (כולל בדיקת מגבלות הפקדה)", expanded=expand_all):
@@ -1466,13 +1450,8 @@ def calculate_accumulation_python(
 
 
 def run_automated_benchmark_suite(db: Session) -> List[Dict[str, str]]:
-    """
-    מריץ בדיקות אוטומטיות (Unit & Integration Tests) על מנוע המגבלות,
-    ובפרט מקרה הקצה של 5,000,000 ₪ מול תקרת קופת הגמל להשקעה (79,006 ₪).
-    """
     results = []
 
-    # בדיקה 1: השקעה של 5,000,000 ₪ – חסימת קופת גמל להשקעה כפתרון מלא
     q_5m = "לקוח עם 5,000,000 ₪ פנויים להשקעה. מה להציע לו?"
     cp_5m = extract_case_parameters(q_5m)
     val_5m = validate_product_constraints_python(db, cp_5m)
@@ -1489,7 +1468,6 @@ def run_automated_benchmark_suite(db: Session) -> List[Dict[str, str]]:
         "תוצאה": "✅ עבר בהצלחה" if pass_5m else "❌ נכשל",
     })
 
-    # בדיקה 2: לקוח שכבר הפקיד השנה 50,000 ₪ לקופת גמל להשקעה ורוצה להפקיד עוד 40,000 ₪
     dummy_client = Client(birth_year=1985, existing_gemel_deposits_this_year=50_000.0)
     cp_partial = extract_case_parameters("רוצה להפקיד 40,000 ₪ חד פעמי", active_client=dummy_client)
     val_partial = validate_product_constraints_python(db, cp_partial)
@@ -1503,7 +1481,6 @@ def run_automated_benchmark_suite(db: Session) -> List[Dict[str, str]]:
         "תוצאה": "✅ עבר בהצלחה" if pass_partial else "❌ נכשל",
     })
 
-    # בדיקה 3: לקוח עם 50,000 ₪ פנויים + 1,000 ₪ בחודש (סה"כ 62,000 ₪ בשנה הראשונה <= 79,006 ₪)
     cp_25 = extract_case_parameters("לקוח בן 25 עם 50,000 ₪ פנויים ו-1,000 ₪ בחודש")
     val_25 = validate_product_constraints_python(db, cp_25)
     pass_25 = (
@@ -1517,7 +1494,6 @@ def run_automated_benchmark_suite(db: Session) -> List[Dict[str, str]]:
         "תוצאה": "✅ עבר בהצלחה" if pass_25 else "❌ נכשל",
     })
 
-    # בדיקה 4: הפרדת מודל עמלות סוכנות (חומה סינית)
     results.append({
         "תרחיש בדיקה": "בדיקת 'חומה סינית' – אי-תלות בין עמלות הסוכנות לבחירת המוצר ללקוח",
         "כלל שנבדק": "אימות שטבלת AgencyCommissionAgreement אינה נקראת ע\"י מנוע המגבלות או מנוע ה-AI של הלקוח",
@@ -1663,7 +1639,6 @@ main_tabs = st.tabs([
     "🧪 6. בדיקות אוטומטיות (QA – כולל מקרה 5 מיליון ₪)",
 ])
 
-# אתחול היסטוריית הצ'אט המובנית ב-Session State
 if "advisor_chat_stream" not in st.session_state:
     st.session_state.advisor_chat_stream = []
 
@@ -1674,7 +1649,6 @@ if "advisor_chat_stream" not in st.session_state:
 with main_tabs[0]:
     st.subheader("💼 סביבת תכנון פיננסי – הצעת השקעה מובנית ובקרת התאמת מוצרים")
 
-    # כפתורי תרחישים לבדיקה מיידית (5 מיליון ₪ מול 50 אלף ₪)
     b_col1, b_col2, _ = st.columns([1, 1, 1])
     with b_col1:
         if st.button("💎 בדוק מקרה: לקוח עם 5,000,000 ₪ פנויים להשקעה"):
@@ -1683,7 +1657,6 @@ with main_tabs[0]:
         if st.button("🌱 בדוק מקרה: בן 25 עם 50,000 ₪ + 1,000 ₪ בחודש"):
             st.session_state.queued_prompt = "יש לי לקוח בן 25 שרוצה להתחיל להשקיע. הוא יכול להפקיד 1,000 ₪ בכל חודש ויש לו 50,000 ₪ פנויים להשקעה מיידית. מה אתה ממליץ?"
 
-    # אזור זרימת השיחה הכרונולוגי
     chat_stream_container = st.container()
     with chat_stream_container:
         if not st.session_state.advisor_chat_stream:
@@ -1704,12 +1677,11 @@ with main_tabs[0]:
                     agent_name=current_user["full_name"],
                 )
 
-        # עוגן תחתון לגלילה אוטומטית חלקה בסיום תשובה
         st.markdown('<div id="chat-bottom-anchor"></div>', unsafe_allow_html=True)
 
 
 # =====================================================================
-# תיבת ההקלדה המעוגנת לתחתית המסך (ברמה הראשית ליציבות מלאה במחשב ובנייד)
+# תיבת ההקלדה המעוגנת לתחתית המסך
 # =====================================================================
 typed_prompt = st.chat_input("הקלד כאן מקרה של לקוח או שאלת המשך על ההצעה שהוצגה...")
 queued_prompt = st.session_state.pop("queued_prompt", None)
@@ -1735,7 +1707,6 @@ if active_prompt:
                     expand_all=expand_all_default,
                     agent_name=current_user["full_name"],
                 )
-                # גלילה אוטומטית חלקה להודעה האחרונה כדי שהמשתמש לא יצטרך לגלול ידנית
                 components.html(
                     """
                     <script>
@@ -1750,7 +1721,7 @@ if active_prompt:
 
 
 # =====================================================================
-# לשונית 2: השוואת גמל־נט, פנסיה־נט וביטוח־נט (ללא אינדקסים וכותרות קצרות)
+# לשונית 2: השוואת גמל־נט, פנסיה־נט וביטוח־נט
 # =====================================================================
 with main_tabs[1]:
     st.subheader("📊 מאגר מסלולים מאומת: גמל־נט, פנסיה־נט, ביטוח־נט ותיקים מנוהלים")
